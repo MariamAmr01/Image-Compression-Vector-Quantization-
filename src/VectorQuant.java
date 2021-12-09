@@ -10,11 +10,13 @@ public class VectorQuant {
 
 
     ArrayList<AverageVector> codeBooks;
+    int bookSize;
     Vector<Vector<Double>> avOld=new Vector<>();
-    Vector<Vector<Double>> avNew=new Vector<>();
 
     public VectorQuant(int n) {
+
         codeBooks = new ArrayList<>(n);
+        bookSize=n;
     }
 
     public Vector<Double> average(Vector<Vector<Integer>> v) {
@@ -102,12 +104,12 @@ public class VectorQuant {
         {
             avOld=av;
 
-            if(codeBooks.size()<4)
+            if(codeBooks.size()<bookSize)
             {
                 codeBooks.clear();
                 split(av,imageVectors);
             }
-            if(codeBooks.size()==4)
+            if(codeBooks.size()==bookSize)
             {
                 for (AverageVector vector : c) {
                     vector.getAssociated().clear();
@@ -217,7 +219,10 @@ public class VectorQuant {
     public static void main(String[] args) throws IOException {
 
         //4-> codebook size
-        VectorQuant obj = new VectorQuant(4);
+        Scanner input=new Scanner(System.in);
+        System.out.print("Enter Code book size: ");
+        int bookSize= input.nextInt();
+        VectorQuant obj = new VectorQuant(bookSize);
 
         int[][] imgArr = {{1, 2, 7, 9, 4, 11}, {3, 4, 6, 6, 12, 12}, {4, 9, 15, 14, 9, 9}, {10, 10, 20, 18, 8, 8}, {4, 3, 17, 16, 1, 4}, {4, 5, 18, 18, 5, 6}};
         Vector<Vector<Integer>> Vectors = new Vector<>();
@@ -243,6 +248,15 @@ public class VectorQuant {
             System.out.println(obj.codeBooks.get(i).getAverageVector());
             System.out.println(obj.codeBooks.get(i).getAssociated());
         }
+
+        for (int i = 0; i < bookSize; i++) {
+            obj.codeBooks.get(i).setCode(Integer.toBinaryString(i));
+            System.out.println(obj.codeBooks.get(i).getCode());
+        }
+
+
+
+
 
 
 
