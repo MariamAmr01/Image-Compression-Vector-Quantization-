@@ -249,8 +249,17 @@ public class VectorQuant {
             System.out.println(obj.codeBooks.get(i).getAssociated());
         }
 
+        int codeLength= (int)(Math.log(bookSize) / Math.log(2));
         for (int i = 0; i < bookSize; i++) {
-            obj.codeBooks.get(i).setCode(Integer.toBinaryString(i));
+            String b = "";
+            String code = Integer.toBinaryString(i);
+            if(code.length() != codeLength){
+                for(int j = 0; j < (codeLength - code.length()); j++){
+                    b+="0";
+                }
+                code = b + code;
+            }
+            obj.codeBooks.get(i).setCode(code);
             System.out.println(obj.codeBooks.get(i).getCode());
         }
 
