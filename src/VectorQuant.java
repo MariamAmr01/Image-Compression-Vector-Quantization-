@@ -78,14 +78,13 @@ public class VectorQuant {
 
             int index = associate.indexOf(Collections.min(associate));
             c.get(index).setAssociated(image);
-            //System.out.println("---"+c.get(index).getAssociated());
             associate.clear();
         }
 
         Vector<Double> temp=new Vector<>();
+        int k=0;
         for (AverageVector vector : c) {
 
-            System.out.println(vector.getAssociated());
                 if(vector.getAssociated().isEmpty())
                 {
                     vector.setAssociated(vector.getAverageVector());
@@ -97,10 +96,7 @@ public class VectorQuant {
                     av.add(temp);
                 }
                 else av.add(average(vector.getAssociated()));
-            
         }
-        System.out.println("=============================");
-
 
         if(!avOld.equals(av))
         {
@@ -115,12 +111,18 @@ public class VectorQuant {
             {
                 for (AverageVector vector : c) {
                     vector.getAssociated().clear();
+                    vector.getAverageVector().clear();
                 }
+
+                for (int i = 0; i < c.size(); i++) {
+                    c.get(i).setAverageVector(getCeiling(avOld.get(i)));
+                }
+                codeBooks=c;
+
                 associate(codeBooks,imageVectors);
             }
             
         }
-        else return;
 
 
     }
@@ -234,8 +236,14 @@ public class VectorQuant {
         Vector<Vector<Double>> Average=new Vector<>();
         Average.add(obj.average(Vectors));
         obj.split(Average,Vectors);
+        System.out.println(obj.avOld);
+        System.out.println("----------------------");
+        for (int i = 0; i < obj.codeBooks.size(); i++) {
+            System.out.println("----------------------");
+            System.out.println(obj.codeBooks.get(i).getAverageVector());
+            System.out.println(obj.codeBooks.get(i).getAssociated());
+        }
 
-        //System.out.println(Vectors);
 
 
     }

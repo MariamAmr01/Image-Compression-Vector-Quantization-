@@ -1,15 +1,14 @@
 import java.util.Vector;
 
 public class AverageVector {
-    private Vector<Vector<Integer>> associated;
+    private final Vector<Vector<Integer>> associated;
     private Vector<Integer> averageVector;
-    private int code;
-
+    private String  code;
 
     public AverageVector(Vector<Integer> v)
     {
         associated=new Vector<>();
-        code=0;
+        code="0";
         averageVector=v;
     }
 
@@ -25,7 +24,7 @@ public class AverageVector {
         this.associated.add(associated);
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
@@ -33,7 +32,7 @@ public class AverageVector {
         return associated;
     }
 
-    public int getCode() {
+    public String  getCode() {
         return code;
     }
 }
