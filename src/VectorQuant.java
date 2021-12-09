@@ -60,14 +60,8 @@ public class VectorQuant {
 
     public void associate(ArrayList<AverageVector> c, Vector<Vector<Integer>> imageVectors) {
 
-//        for (AverageVector vector : c) {
-//            vector.getAssociated().clear();
-//        }
         Vector<Vector<Double>> av=new Vector<>();
-        // if(avOld==avNew&&avOld!=null)
-        // {
-        //     return;
-        // }
+
         ArrayList<Integer> associate = new ArrayList<>();
 
         for (Vector<Integer> image : imageVectors) {
@@ -87,15 +81,6 @@ public class VectorQuant {
             //System.out.println("---"+c.get(index).getAssociated());
             associate.clear();
         }
-        // Set<AverageVector> set = new LinkedHashSet<>();
-        // set.addAll(c);
-        // c.clear();
-        // c.addAll(set);
-
-        // for (int i = 0; i < c.size(); i++) {
-        //    System.out.println("---"+c.get(i).getAssociated());
- 
-        // }
 
         Vector<Double> temp=new Vector<>();
         for (AverageVector vector : c) {
@@ -128,7 +113,6 @@ public class VectorQuant {
             }
             if(codeBooks.size()==4)
             {
-                //avOld=av;
                 for (AverageVector vector : c) {
                     vector.getAssociated().clear();
                 }
@@ -143,14 +127,6 @@ public class VectorQuant {
 
     public void split(Vector<Vector<Double>> v,Vector<Vector<Integer>> image) {
 
-//        if (codeBooks.size()<=4) {
-//            //codeBooks.clear();
-//            AverageVector avC = new AverageVector(getCeiling(average(v)));
-//            AverageVector avF = new AverageVector(getFloor(average(v)));
-//            codeBooks.add(avF);
-//            codeBooks.add(avC);
-//            associate(codeBooks, image);
-//        }
         for (Vector<Double> doubles : v) {
 
             AverageVector avC = new AverageVector(getCeiling(doubles));
