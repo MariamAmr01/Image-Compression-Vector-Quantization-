@@ -64,10 +64,10 @@ public class VectorQuant {
 //            vector.getAssociated().clear();
 //        }
         Vector<Vector<Double>> av=new Vector<>();
-        if(avOld==avNew&&avOld!=null)
-        {
-            return;
-        }
+        // if(avOld==avNew&&avOld!=null)
+        // {
+        //     return;
+        // }
         ArrayList<Integer> associate = new ArrayList<>();
 
         for (Vector<Integer> image : imageVectors) {
@@ -87,6 +87,15 @@ public class VectorQuant {
             //System.out.println("---"+c.get(index).getAssociated());
             associate.clear();
         }
+        // Set<AverageVector> set = new LinkedHashSet<>();
+        // set.addAll(c);
+        // c.clear();
+        // c.addAll(set);
+
+        // for (int i = 0; i < c.size(); i++) {
+        //    System.out.println("---"+c.get(i).getAssociated());
+ 
+        // }
 
         Vector<Double> temp=new Vector<>();
         for (AverageVector vector : c) {
@@ -103,11 +112,15 @@ public class VectorQuant {
                     av.add(temp);
                 }
                 else av.add(average(vector.getAssociated()));
+            
+        }
+        System.out.println("=============================");
 
-            }
-        avNew=av;
-        if(avOld!=av)
+
+        if(!avOld.equals(av))
         {
+            avOld=av;
+
             if(codeBooks.size()<4)
             {
                 codeBooks.clear();
@@ -115,10 +128,12 @@ public class VectorQuant {
             }
             if(codeBooks.size()==4)
             {
-                associate(c,imageVectors);
+                avOld=av;
+                associate(codeBooks,imageVectors);
             }
-            avOld=av;
+            
         }
+        else return;
 
 
     }
