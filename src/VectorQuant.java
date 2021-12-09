@@ -128,7 +128,10 @@ public class VectorQuant {
             }
             if(codeBooks.size()==4)
             {
-                avOld=av;
+                //avOld=av;
+                for (AverageVector vector : c) {
+                    vector.getAssociated().clear();
+                }
                 associate(codeBooks,imageVectors);
             }
             
