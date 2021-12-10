@@ -374,16 +374,19 @@ public class VectorQuant {
         com.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 JTextField bookSizeTxt = new JTextField("Code book size");
-                JTextField vectorSizeTxt = new JTextField("Vector size");
+                JTextField vectorSizeHeight = new JTextField("Vector Height");
+                JTextField vectorSizeWidth = new JTextField("Vector Width");
                 JButton b = new JButton("Enter");
 
                 vectorFrame.add(bookSizeTxt);
-                vectorFrame.add(vectorSizeTxt);
+                vectorFrame.add(vectorSizeHeight);
+                vectorFrame.add(vectorSizeWidth);
                 vectorFrame.add(b);
 
                 bookSizeTxt.setBounds(130, 250, 130, 40);
-                vectorSizeTxt.setBounds(130, 300, 130, 40);
-                b.setBounds(130, 350, 130, 40);
+                vectorSizeHeight.setBounds(130, 350, 130, 40);
+                vectorSizeWidth.setBounds(130, 300, 130, 40);
+                b.setBounds(130, 400, 130, 40);
 
 
                 b.addActionListener(new ActionListener() {
@@ -392,7 +395,7 @@ public class VectorQuant {
                         int bookSize1,vectorSize;
                         bookSize1 = Integer.parseInt(bookSizeTxt.getText());
                         obj.setBookSize(bookSize1);
-                        vectorSize = Integer.parseInt(vectorSizeTxt.getText());
+                        vectorSize = Integer.parseInt(vectorSizeHeight.getText())*Integer.parseInt(vectorSizeWidth.getText());
                         try {
                             error2.setVisible(!obj.compress((int)Math.sqrt(vectorSize)));
                         } catch (IOException ex) {
@@ -400,7 +403,8 @@ public class VectorQuant {
                         }
                         error.setVisible(false);
                         bookSizeTxt.setVisible(false);
-                        vectorSizeTxt.setVisible(false);
+                        vectorSizeWidth.setVisible(false);
+                        vectorSizeHeight.setVisible(false);
                         b.setVisible(false);
                     }});
 
@@ -425,7 +429,7 @@ public class VectorQuant {
             }
         });
 
-        vectorFrame.setSize(400, 450);
+        vectorFrame.setSize(400, 500);
         vectorFrame.setLayout(null);
         vectorFrame.setVisible(true);
         vectorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
