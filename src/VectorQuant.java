@@ -137,7 +137,6 @@ public class VectorQuant {
             AverageVector avF = new AverageVector(getFloor(doubles));
             codeBooks.add(avF);
             codeBooks.add(avC);
-            //associate(codeBooks, image);
         }
         associate(codeBooks, image);
     }
