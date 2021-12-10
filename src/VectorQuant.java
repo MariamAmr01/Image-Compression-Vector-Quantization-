@@ -65,6 +65,9 @@ public class VectorQuant {
         Vector<Vector<Double>> av=new Vector<>();
 
         ArrayList<Integer> associate = new ArrayList<>();
+        //System.out.println("Image Size"+imageVectors.get(0).size());
+        //System.out.println("AverageVector Size"+c.get(0).getAverageVector().size());
+
 
         for (Vector<Integer> image : imageVectors) {
             //System.out.println(image.size());
@@ -72,7 +75,7 @@ public class VectorQuant {
                 int x = 0;
 
                 for (int j = 0; j < vector.getAverageVector().size(); j++) {
-                    x += Math.pow(vector.getAverageVector().get(j) - image.get(j), 2);
+                    if(j < image.size()) x += Math.pow(vector.getAverageVector().get(j) - image.get(j), 2);
 
                 }
                 associate.add(x);
@@ -143,7 +146,7 @@ public class VectorQuant {
 
     public void compress(int vectorSize) throws IOException {
         // MATRIX FROM IMAGE
-        File file = new File("dog.JPG");
+        File file = new File("j.JPG");
         BufferedImage img = ImageIO.read(file);
         int width = img.getWidth();
         int height = img.getHeight();
@@ -308,11 +311,11 @@ public class VectorQuant {
         int vectorSize=codeBookVector.get(0).size();
         Vector<Integer> v1 =new Vector<>();
         Vector<Vector<Integer>> v2 =new Vector<>();
-        for(int i=0; (i < imageVector.size()); i+=(236 / Math.sqrt(vectorSize)))
+        for(int i=0; (i < imageVector.size()); i+=(260 / Math.sqrt(vectorSize)))
         {
             for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
                 m=j;
-                for (int k = i; k < i+(236 / Math.sqrt(vectorSize)); k++) {
+                for (int k = i; k < i+(260 / Math.sqrt(vectorSize)); k++) {
 
                     for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
 
@@ -329,10 +332,10 @@ public class VectorQuant {
         System.out.println(v2.size());
 
 
-        int[][] newImg = new int[236][212];
-        for(int i=0; (i < 236); i++)
+        int[][] newImg = new int[260][195];
+        for(int i=0; (i < 260); i++)
         {
-            for( int x=0; (x < 212); x++)
+            for( int x=0; (x < 195); x++)
             {
                 newImg[i][x] = v2.get(x).get(i);
             }
@@ -348,11 +351,11 @@ public class VectorQuant {
 //
 //        }
         //GET IMAGE FROM MATRIX
-        BufferedImage image= new BufferedImage(236, 212,BufferedImage.TYPE_BYTE_INDEXED);
+        BufferedImage image= new BufferedImage(260, 195,BufferedImage.TYPE_BYTE_INDEXED);
         //System.out.println(240);
         ///System.out.println(216);
-        for(int i=0; i<236; i++) {
-            for(int x=0; x<212; x++) {
+        for(int i=0; i<260; i++) {
+            for(int x=0; x<195; x++) {
                 int a =newImg[i][x];
                 Color newColor = new Color(a,a,a);
                 image.setRGB(i,x,newColor.getRGB());
