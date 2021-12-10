@@ -65,12 +65,9 @@ public class VectorQuant {
         Vector<Vector<Double>> av=new Vector<>();
 
         ArrayList<Integer> associate = new ArrayList<>();
-        //System.out.println("Image Size"+imageVectors.get(0).size());
-        //System.out.println("AverageVector Size"+c.get(0).getAverageVector().size());
 
 
         for (Vector<Integer> image : imageVectors) {
-            //System.out.println(image.size());
             for (AverageVector vector : c) {
                 int x = 0;
 
@@ -87,7 +84,6 @@ public class VectorQuant {
         }
 
         Vector<Double> temp=new Vector<>();
-        int k=0;
         for (AverageVector vector : c) {
 
                 if(vector.getAssociated().isEmpty())
@@ -146,7 +142,7 @@ public class VectorQuant {
 
     public void compress(int vectorSize) throws IOException {
         // MATRIX FROM IMAGE
-        File file = new File("w2.JPG");
+        File file = new File("d3.JPG");
         BufferedImage img = ImageIO.read(file);
         int width = img.getWidth();
         int height = img.getHeight();
@@ -230,6 +226,7 @@ public class VectorQuant {
         for (AverageVector v: codeBooks) {
             codeOutput.append(v.getCode()+" "+v.getAverageVector()+"_");
         }
+        codeOutput.append(resizedHeight+"_"+resizedWidth);
         codeOutput.append("\n");
         for (Vector<Integer> vector : vectors) {
 
@@ -259,7 +256,7 @@ public class VectorQuant {
         //System.out.println("---------------------");
         //System.out.println(codeBook);
         String[] s = codeBook.split("_");
-        imageCode=s[s.length-1];
+        imageCode=s[s.length-3];
         //System.out.println("---------------------");
         //System.out.println("imageCode: "+imageCode);
 
@@ -267,12 +264,12 @@ public class VectorQuant {
         Vector<Vector<Integer>> codeBookVector=new Vector<>();
         Vector<Integer> ints= new Vector<>();
         //s.length-3
-        for (int i = 0; i < s.length-1; i++) {
+        for (int i = 0; i < s.length-3; i++) {
             label.add(s[i].substring(0,s[i].indexOf(" ")));
         }
 
         //s.length-3
-        for (int i = 0; i < s.length-1; i++) {
+        for (int i = 0; i < s.length-3; i++) {
 
             String n=s[i].substring(s[i].indexOf("[")+1,s[i].length()-1);
             String [] num =n.split(", ");
@@ -305,17 +302,19 @@ public class VectorQuant {
         }
 
         //System.out.println("ImageVector: "+ imageVector);
+        int height = Integer.parseInt(s[s.length-2]);
+        int width = Integer.parseInt(s[s.length-1]);
 
         int m = 0;
         int j=0;
         int vectorSize=codeBookVector.get(0).size();
         Vector<Integer> v1 =new Vector<>();
         Vector<Vector<Integer>> v2 =new Vector<>();
-        for(int i=0; (i < imageVector.size()); i+=(200 / Math.sqrt(vectorSize)))
+        for(int i=0; (i < imageVector.size()); i+=(width / Math.sqrt(vectorSize)))
         {
             for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
                 m=j;
-                for (int k = i; k < i+(200 / Math.sqrt(vectorSize)); k++) {
+                for (int k = i; k < i+(width / Math.sqrt(vectorSize)); k++) {
 
                     for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
 
@@ -332,10 +331,10 @@ public class VectorQuant {
         System.out.println(v2.size());
 
 
-    //    int[][] newImg = new int[200][200];
-    //    for(int i=0; (i < 200); i++)
+    //    int[][] newImg = new int[220][220];
+    //    for(int i=0; (i < 220); i++)
     //    {
-    //        for( int x=0; (x < 200); x++)
+    //        for( int x=0; (x < 220); x++)
     //        {
     //            newImg[i][x] = v2.get(x).get(i);
     //        }
@@ -344,12 +343,12 @@ public class VectorQuant {
        /////////////////////////////////////////////////
 
         //GET IMAGE FROM MATRIX
-        BufferedImage image= new BufferedImage(200, 200,BufferedImage.TYPE_BYTE_INDEXED);
+        BufferedImage image= new BufferedImage(width, height,BufferedImage.TYPE_BYTE_INDEXED);
 
         //System.out.println(240);
         //System.out.println(216);
-        for(int i=0; i<200; i++) {
-            for(int x=0; x<200; x++) {
+        for(int i=0; i<height; i++) {
+            for(int x=0; x<width; x++) {
                 int a =v2.get(x).get(i);
                 Color newColor = new Color(a,a,a);
                 image.setRGB(x,i,newColor.getRGB());
