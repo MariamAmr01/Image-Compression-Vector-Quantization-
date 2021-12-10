@@ -1,5 +1,8 @@
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.*;
@@ -12,9 +15,12 @@ public class VectorQuant {
     int bookSize;
     Vector<Vector<Double>> avOld=new Vector<>();
 
-    public VectorQuant(int n) {
+    public VectorQuant() {
 
-        codeBooks = new ArrayList<>(n);
+        codeBooks = new ArrayList<>();
+    }
+    public void setBookSize(int n)
+    {
         bookSize=n;
     }
 
@@ -135,210 +141,294 @@ public class VectorQuant {
         associate(codeBooks, image);
     }
 
-    public void compress(int vectorSize) throws IOException {
+    public boolean compress(int vectorSize) throws IOException {
         // MATRIX FROM IMAGE
         File file = new File("d3.JPG");
-        BufferedImage img = ImageIO.read(file);
-        int width = img.getWidth();
-        int height = img.getHeight();
-        int[][] imgArr = new int[width][height];
-        Raster raster = img.getData();
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                imgArr[i][j] = raster.getSample(i, j, 0);
-            }
-        }
-
-
-        //Resize image
-        int resizedHeight=height;
-        int resizedWidth=width;
-        if(height % vectorSize!=0)
-        {
-            resizedHeight=((height / vectorSize) + 1) * vectorSize;
-        }
-        if(width % vectorSize!=0)
-        {
-            resizedWidth=( (width  /  vectorSize) + 1) * vectorSize;
-        }
-        System.out.println(resizedWidth);
-        System.out.println(resizedHeight);
-        int[][] resizedImage = new int[resizedWidth][resizedHeight];
-        for (int i = 0; i < resizedWidth; i++) {
-            int x = i;
-            if (i >= width) {
-                x = width - 1;
-            }
-            for (int j = 0; j < resizedHeight; j++) {
-                int y = j ;
-                if(j>=height)
-                {
-                    y=height-1;
+        if (file.exists()) {
+            BufferedImage img = ImageIO.read(file);
+            int width = img.getWidth();
+            int height = img.getHeight();
+            int[][] imgArr = new int[width][height];
+            Raster raster = img.getData();
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    imgArr[i][j] = raster.getSample(i, j, 0);
                 }
-                resizedImage[i][j] = imgArr[x][y];
             }
-        }
-        Vector<Vector<Integer>> vectors = new Vector<>();
-         //Vectors of image
-        for (int i = 0; i < resizedWidth; i+= vectorSize) {
-            for (int j = 0; j < resizedHeight; j+= vectorSize) {
-                vectors.add(new Vector<>());
-                for (int x = i; x < i + vectorSize; x++) {
-                    for (int y = j; y < j + vectorSize; y++) {
-                        vectors.lastElement().add(resizedImage[x][y]);
+
+
+            //Resize image
+            int resizedHeight = height;
+            int resizedWidth = width;
+            if (height % vectorSize != 0) {
+                resizedHeight = ((height / vectorSize) + 1) * vectorSize;
+            }
+            if (width % vectorSize != 0) {
+                resizedWidth = ((width / vectorSize) + 1) * vectorSize;
+            }
+            System.out.println(resizedWidth);
+            System.out.println(resizedHeight);
+            int[][] resizedImage = new int[resizedWidth][resizedHeight];
+            for (int i = 0; i < resizedWidth; i++) {
+                int x = i;
+                if (i >= width) {
+                    x = width - 1;
+                }
+                for (int j = 0; j < resizedHeight; j++) {
+                    int y = j;
+                    if (j >= height) {
+                        y = height - 1;
+                    }
+                    resizedImage[i][j] = imgArr[x][y];
+                }
+            }
+            Vector<Vector<Integer>> vectors = new Vector<>();
+            //Vectors of image
+            for (int i = 0; i < resizedWidth; i += vectorSize) {
+                for (int j = 0; j < resizedHeight; j += vectorSize) {
+                    vectors.add(new Vector<>());
+                    for (int x = i; x < i + vectorSize; x++) {
+                        for (int y = j; y < j + vectorSize; y++) {
+                            vectors.lastElement().add(resizedImage[x][y]);
+                        }
                     }
                 }
             }
-        }
-        Vector<Vector<Double>> Average=new Vector<>();
-        Average.add(average(vectors));
-        split(Average,vectors);
+            Vector<Vector<Double>> Average = new Vector<>();
+            Average.add(average(vectors));
+            split(Average, vectors);
 
-        int codeLength= (int )Math.ceil(Math.log(codeBooks.size()) / Math.log(2));
-        for (int i = 0; i <codeBooks.size(); i++) {
-            String b = "";
-            String code = Integer.toBinaryString(i);
-            if(code.length() != codeLength){
-                for(int j = 0; j < (codeLength - code.length()); j++){
-                    b+="0";
+            int codeLength = (int) Math.ceil(Math.log(codeBooks.size()) / Math.log(2));
+            for (int i = 0; i < codeBooks.size(); i++) {
+                String b = "";
+                String code = Integer.toBinaryString(i);
+                if (code.length() != codeLength) {
+                    for (int j = 0; j < (codeLength - code.length()); j++) {
+                        b += "0";
+                    }
+                    code = b + code;
                 }
-                code = b + code;
+                codeBooks.get(i).setCode(code);
+
             }
-            codeBooks.get(i).setCode(code);
+            boolean present = false;
+            File f = new File("Compressed.txt");
+            if (f.exists()) f.delete();
+            FileWriter codeOutput = new FileWriter("Compressed.txt", true);
+            for (AverageVector v : codeBooks) {
+                codeOutput.append(v.getCode() + " " + v.getAverageVector() + "_");
+            }
+            codeOutput.append("\n");
+            for (Vector<Integer> vector : vectors) {
 
-        }
-        boolean present=false;
-        File f = new File("Compressed.txt");
-        if(f.exists()) f.delete();
-        FileWriter codeOutput=new FileWriter("Compressed.txt",true);
-        for (AverageVector v: codeBooks) {
-            codeOutput.append(v.getCode()+" "+v.getAverageVector()+"_");
-        }
-        codeOutput.append("\n");
-        for (Vector<Integer> vector : vectors) {
+                for (int j = 0; j < codeBooks.size(); j++) {
 
-            for (int j = 0; j < codeBooks.size(); j++) {
-
-                present = codeBooks.get(j).getAssociated().contains(vector);
-                if (present) {
-                    codeOutput.append(codeBooks.get(j).getCode());
-                    break;
+                    present = codeBooks.get(j).getAssociated().contains(vector);
+                    if (present) {
+                        codeOutput.append(codeBooks.get(j).getCode());
+                        break;
+                    }
                 }
+
             }
+            codeOutput.append("_" + resizedHeight + "_" + resizedWidth);
 
+            codeOutput.close();
         }
-        codeOutput.append("_"+resizedHeight+"_"+resizedWidth);
-
-        codeOutput.close();
+        return file.exists();
     }
 
-    public void decompress() throws IOException {
+    public boolean decompress() throws IOException {
 
         File com= new File("Compressed.txt");
-        Scanner scan = new Scanner(com);
-        String codeBook="";
-        String imageCode;
-        while (scan.hasNextLine()) {
-            codeBook += scan.nextLine();
-        }
-
-        String[] s = codeBook.split("_");
-        imageCode=s[s.length-3];
-
-        ArrayList<String> label=new ArrayList<>();
-        Vector<Vector<Integer>> codeBookVector=new Vector<>();
-        Vector<Integer> ints= new Vector<>();
-
-        for (int i = 0; i < s.length-3; i++) {
-            label.add(s[i].substring(0,s[i].indexOf(" ")));
-        }
-
-        for (int i = 0; i < s.length-3; i++) {
-
-            String n=s[i].substring(s[i].indexOf("[")+1,s[i].length()-1);
-            String [] num =n.split(", ");
-            for(String k : num) {
-                ints.add(Integer.parseInt(k));
+        if (com.exists()) {
+            Scanner scan = new Scanner(com);
+            String codeBook = "";
+            String imageCode;
+            while (scan.hasNextLine()) {
+                codeBook += scan.nextLine();
             }
-            codeBookVector.add(ints);
-            ints= new Vector<>();
 
-        }
+            String[] s = codeBook.split("_");
+            imageCode = s[s.length - 3];
 
-        Vector<Vector<Integer>> imageVector= new Vector<>();
+            ArrayList<String> label = new ArrayList<>();
+            Vector<Vector<Integer>> codeBookVector = new Vector<>();
+            Vector<Integer> ints = new Vector<>();
 
-        int length=label.get(0).length();
+            for (int i = 0; i < s.length - 3; i++) {
+                label.add(s[i].substring(0, s[i].indexOf(" ")));
+            }
 
-        for (int i = 0; i < imageCode.length(); i+=length) {
+            for (int i = 0; i < s.length - 3; i++) {
 
-            for (int j = 0; j < label.size(); j++) {
-
-                if(label.get(j).equals(imageCode.substring(i,i+length)))
-                {
-                    imageVector.add(codeBookVector.get(j));
-                    break;
+                String n = s[i].substring(s[i].indexOf("[") + 1, s[i].length() - 1);
+                String[] num = n.split(", ");
+                for (String k : num) {
+                    ints.add(Integer.parseInt(k));
                 }
+                codeBookVector.add(ints);
+                ints = new Vector<>();
+
             }
 
-        }
+            Vector<Vector<Integer>> imageVector = new Vector<>();
 
-        int height = Integer.parseInt(s[s.length-2]);
-        int width = Integer.parseInt(s[s.length-1]);
+            int length = label.get(0).length();
 
-        int m = 0;
-        int j=0;
-        int vectorSize=codeBookVector.get(0).size();
-        Vector<Integer> v1 =new Vector<>();
-        Vector<Vector<Integer>> v2 =new Vector<>();
-        for(int i=0; (i < imageVector.size()); i+=(width / Math.sqrt(vectorSize)))
-        {
-            for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
-                m=j;
-                for (int k = i; k < i+(width / Math.sqrt(vectorSize)); k++) {
+            for (int i = 0; i < imageCode.length(); i += length) {
 
-                    for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
+                for (int j = 0; j < label.size(); j++) {
 
-                        v1.add(imageVector.get(k).get(j));
+                    if (label.get(j).equals(imageCode.substring(i, i + length))) {
+                        imageVector.add(codeBookVector.get(j));
+                        break;
                     }
+                }
+
+            }
+
+            int height = Integer.parseInt(s[s.length - 2]);
+            int width = Integer.parseInt(s[s.length - 1]);
+
+            int m = 0;
+            int j = 0;
+            int vectorSize = codeBookVector.get(0).size();
+            Vector<Integer> v1 = new Vector<>();
+            Vector<Vector<Integer>> v2 = new Vector<>();
+            for (int i = 0; (i < imageVector.size()); i += (width / Math.sqrt(vectorSize))) {
+                for (int l = 0; l < Math.sqrt(imageVector.get(i).size()); l++) {
+                    m = j;
+                    for (int k = i; k < i + (width / Math.sqrt(vectorSize)); k++) {
+
+                        for (j = m; j < m + Math.sqrt(imageVector.get(i).size()); j++) {
+
+                            v1.add(imageVector.get(k).get(j));
+                        }
+
+                    }
+                    v2.add(v1);
+                    v1 = new Vector<>();
 
                 }
-                v2.add(v1);
-                v1 = new Vector<>();
-
+                j = 0;
             }
-            j=0;
-        }
-        System.out.println(v2.size());
+            System.out.println(v2.size());
 
-       /////////////////////////////////////////////////
+            /////////////////////////////////////////////////
 
-        //GET IMAGE FROM MATRIX
-        BufferedImage image= new BufferedImage(width, height,BufferedImage.TYPE_BYTE_INDEXED);
+            //GET IMAGE FROM MATRIX
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
 
-        for(int i=0; i<height; i++) {
-            for(int x=0; x<width; x++) {
-                int a =v2.get(x).get(i);
-                Color newColor = new Color(a,a,a);
-                image.setRGB(x,i,newColor.getRGB());
+            for (int i = 0; i < height; i++) {
+                for (int x = 0; x < width; x++) {
+                    int a = v2.get(x).get(i);
+                    Color newColor = new Color(a, a, a);
+                    image.setRGB(x, i, newColor.getRGB());
+                }
             }
+            File output = new File("GrayScale.jpg");
+            ImageIO.write(image, "jpg", output);
         }
-        File output = new File("GrayScale.jpg");
-        ImageIO.write(image, "jpg", output);
-
+        return com.exists();
     }
 
 
     public static void main(String[] args) throws IOException {
 
         Scanner input=new Scanner(System.in);
-        System.out.print("Enter Code book size: ");
-        int bookSize= input.nextInt();
-        System.out.print("Enter vector size: ");
-        int vectorSize= input.nextInt();
-        VectorQuant obj = new VectorQuant(bookSize);
+        //System.out.print("Enter Code book size: ");
+        //int bookSize1;
+       // System.out.print("Enter vector size: ");
+        //int vectorSize= input.nextInt();
+        VectorQuant obj = new VectorQuant();
         //2*2 = 4 (vector size)
-        obj.compress((int)Math.sqrt(vectorSize));
-        obj.decompress();
+        //obj.compress((int)Math.sqrt(vectorSize));
+        //obj.decompress();
+
+        JFrame vectorFrame = new JFrame("Vector Quantization Compression/Decompression");
+        JButton com = new JButton("Compress");
+        JButton decom = new JButton("Decompress");
+        JButton exit = new JButton("Exit");
+        JLabel enter=new JLabel("Click your choice");
+        JLabel error=new JLabel("Compressed file not found");
+        JLabel error2=new JLabel("Input file not found");
+
+        enter.setBounds(145, 60, 150, 40);
+        com.setBounds(130, 100, 130, 40);
+        decom.setBounds(130, 150, 130, 40);
+        exit.setBounds(130, 200, 130, 40);
+        error.setBounds(130, 240, 150, 40);
+        error2.setBounds(130, 240, 150, 40);
+
+        error.setVisible(false);
+        error2.setVisible(false);
+
+        vectorFrame.add(com);
+        vectorFrame.add(decom);
+        vectorFrame.add(exit);
+        vectorFrame.add(enter);
+        vectorFrame.add(error);
+        vectorFrame.add(error2);
+
+        com.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                JTextField bookSizeTxt = new JTextField("Code book size");
+                JTextField vectorSizeTxt = new JTextField("Vector size");
+                JButton b = new JButton("Enter");
+
+                vectorFrame.add(bookSizeTxt);
+                vectorFrame.add(vectorSizeTxt);
+                vectorFrame.add(b);
+
+                bookSizeTxt.setBounds(130, 250, 130, 40);
+                vectorSizeTxt.setBounds(130, 300, 130, 40);
+                b.setBounds(130, 350, 130, 40);
+
+
+                b.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event)
+                    {
+                        int bookSize1,vectorSize;
+                        bookSize1 = Integer.parseInt(bookSizeTxt.getText());
+                        obj.setBookSize(bookSize1);
+                        vectorSize = Integer.parseInt(vectorSizeTxt.getText());
+                        try {
+                            error2.setVisible(!obj.compress((int)Math.sqrt(vectorSize)));
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        error.setVisible(false);
+                        bookSizeTxt.setVisible(false);
+                        vectorSizeTxt.setVisible(false);
+                        b.setVisible(false);
+                    }});
+
+
+            }
+        });
+
+        decom.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                try {
+                    error.setVisible(!obj.decompress());
+                    error2.setVisible(false);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        exit.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                System.exit(0);
+            }
+        });
+
+        vectorFrame.setSize(400, 450);
+        vectorFrame.setLayout(null);
+        vectorFrame.setVisible(true);
+        vectorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
 }
