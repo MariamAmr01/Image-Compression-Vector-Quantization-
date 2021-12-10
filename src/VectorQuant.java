@@ -146,7 +146,7 @@ public class VectorQuant {
 
     public void compress(int vectorSize) throws IOException {
         // MATRIX FROM IMAGE
-        File file = new File("j.JPG");
+        File file = new File("w2.JPG");
         BufferedImage img = ImageIO.read(file);
         int width = img.getWidth();
         int height = img.getHeight();
@@ -311,11 +311,11 @@ public class VectorQuant {
         int vectorSize=codeBookVector.get(0).size();
         Vector<Integer> v1 =new Vector<>();
         Vector<Vector<Integer>> v2 =new Vector<>();
-        for(int i=0; (i < imageVector.size()); i+=(260 / Math.sqrt(vectorSize)))
+        for(int i=0; (i < imageVector.size()); i+=(200 / Math.sqrt(vectorSize)))
         {
             for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
                 m=j;
-                for (int k = i; k < i+(260 / Math.sqrt(vectorSize)); k++) {
+                for (int k = i; k < i+(200 / Math.sqrt(vectorSize)); k++) {
 
                     for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
 
@@ -332,24 +332,27 @@ public class VectorQuant {
         System.out.println(v2.size());
 
 
-//        int[][] newImg = new int[260][195];
-//        for(int i=0; (i < 260); i++)
-//        {
-//            for( int x=0; (x < 195); x++)
-//            {
-//                newImg[i][x] = v2.get(x).get(i);
-//            }
-//
-//        }
+    //    int[][] newImg = new int[200][200];
+    //    for(int i=0; (i < 200); i++)
+    //    {
+    //        for( int x=0; (x < 200); x++)
+    //        {
+    //            newImg[i][x] = v2.get(x).get(i);
+    //        }
+
+    //    }
+       /////////////////////////////////////////////////
+
         //GET IMAGE FROM MATRIX
-        BufferedImage image= new BufferedImage(260, 195,BufferedImage.TYPE_BYTE_INDEXED);
+        BufferedImage image= new BufferedImage(200, 200,BufferedImage.TYPE_BYTE_INDEXED);
+
         //System.out.println(240);
-        ///System.out.println(216);
-        for(int i=0; i<260; i++) {
-            for(int x=0; x<195; x++) {
+        //System.out.println(216);
+        for(int i=0; i<200; i++) {
+            for(int x=0; x<200; x++) {
                 int a =v2.get(x).get(i);
                 Color newColor = new Color(a,a,a);
-                image.setRGB(i,x,newColor.getRGB());
+                image.setRGB(x,i,newColor.getRGB());
             }
         }
         File output = new File("GrayScale.jpg");
