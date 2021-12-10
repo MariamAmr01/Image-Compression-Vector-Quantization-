@@ -332,22 +332,13 @@ public class VectorQuant {
         System.out.println(v2.size());
 
 
-        int[][] newImg = new int[260][195];
-        for(int i=0; (i < 260); i++)
-        {
-            for( int x=0; (x < 195); x++)
-            {
-                newImg[i][x] = v2.get(x).get(i);
-            }
-
-        }
-//        for(int i=0; (i < 212); i++)
+//        int[][] newImg = new int[260][195];
+//        for(int i=0; (i < 260); i++)
 //        {
-//            for( int x=0; (x < 236); x++)
+//            for( int x=0; (x < 195); x++)
 //            {
-//                System.out.print( newImg[i][x] +" ");
+//                newImg[i][x] = v2.get(x).get(i);
 //            }
-//            System.out.print( "\n ");
 //
 //        }
         //GET IMAGE FROM MATRIX
@@ -356,7 +347,7 @@ public class VectorQuant {
         ///System.out.println(216);
         for(int i=0; i<260; i++) {
             for(int x=0; x<195; x++) {
-                int a =newImg[i][x];
+                int a =v2.get(x).get(i);
                 Color newColor = new Color(a,a,a);
                 image.setRGB(i,x,newColor.getRGB());
             }
