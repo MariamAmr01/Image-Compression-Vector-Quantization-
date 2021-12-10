@@ -259,12 +259,14 @@ public class VectorQuant {
         System.out.println("imageCode: "+imageCode);
 
         ArrayList<String> label=new ArrayList<>();
-        Vector<Vector<Integer>> imageVector=new Vector<>();
+        Vector<Vector<Integer>> codeBookVector=new Vector<>();
         Vector<Integer> ints= new Vector<>();
+        //s.length-3
         for (int i = 0; i < s.length-1; i++) {
             label.add(s[i].substring(0,s[i].indexOf(" ")));
         }
 
+        //s.length-3
         for (int i = 0; i < s.length-1; i++) {
 
             String n=s[i].substring(s[i].indexOf("[")+1,s[i].length()-1);
@@ -272,28 +274,79 @@ public class VectorQuant {
             for(String k : num) {
                 ints.add(Integer.parseInt(k));
             }
-            imageVector.add(ints);
+            codeBookVector.add(ints);
             ints= new Vector<>();
 
         }
 
         System.out.println("Code: "+label);
-        System.out.println("imageVector: "+imageVector);
+        System.out.println("codeBookVector: "+codeBookVector);
 
+        Vector<Vector<Integer>> imageVector= new Vector<>();
 
-         //GET IMAGE FROM MATRIX
-//        BufferedImage image= new BufferedImage(240, 216,BufferedImage.TYPE_BYTE_INDEXED);
-//        System.out.println(240);
-//        System.out.println(216);
-//        for(int i=0; i<imageVector.size(); i++) {
-//            for(int j=0; j<imageVector.get(i).size(); j++) {
-//                int a =imageVector.get(i).get(j);
-//                Color newColor = new Color(a,a,a);
-//                image.setRGB(i,j,newColor.getRGB());
-//            }
-//        }
-//        File output = new File("GrayScale.jpg");
-//        ImageIO.write(image, "jpg", output);
+        int length=label.get(0).length();
+
+        for (int i = 0; i < imageCode.length(); i+=length) {
+
+            for (int j = 0; j < label.size(); j++) {
+
+                if(label.get(j).equals(imageCode.substring(i,i+length)))
+                {
+                    imageVector.add(codeBookVector.get(j));
+                    break;
+                }
+            }
+
+        }
+
+        System.out.println("ImageVector: "+ imageVector);
+
+        int m = 0;
+        int j=0;
+        int vectorSize=codeBookVector.get(0).size();
+        Vector<Integer> v1 =new Vector<>();
+        Vector<Vector<Integer>> v2 =new Vector<>();
+        for(int i=0; (i < imageVector.size()); i+=(240 / Math.sqrt(vectorSize)))
+        {
+            for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
+                m=j;
+                for (int k = i; k < i+(240 / Math.sqrt(vectorSize)); k++) {
+
+                    for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
+
+                        v1.add(imageVector.get(k).get(j));
+                    }
+
+                }
+                v2.add(v1);
+                v1 = new Vector<>();
+
+            }
+            j=0;
+        }
+        System.out.println(v2.size());
+        int[][] newImg = new int[216][240];
+        for(int i=0; (i < 216); i++)
+        {
+            for( int x=0; (x < 240); x++)
+            {
+                newImg[i][x] = v2.get(i).get(x);
+            }
+
+        }
+        //GET IMAGE FROM MATRIX
+        BufferedImage image= new BufferedImage(216, 240,BufferedImage.TYPE_BYTE_INDEXED);
+        //System.out.println(240);
+        ///System.out.println(216);
+        for(int i=0; i<216; i++) {
+            for(int x=0; x<240; x++) {
+                int a =newImg[i][x];
+                Color newColor = new Color(a,a,a);
+                image.setRGB(i,x,newColor.getRGB());
+            }
+        }
+        File output = new File("GrayScale.jpg");
+        ImageIO.write(image, "jpg", output);
 
     }
 
@@ -324,7 +377,7 @@ public class VectorQuant {
 //                }
 //            }
 //        }
-
+//
 //        Vector<Vector<Double>> Average=new Vector<>();
 //        Average.add(obj.average(vectors));
 //        obj.split(Average,vectors);
@@ -369,8 +422,8 @@ public class VectorQuant {
 //        }
 //        //System.out.println(vectors);
 //        codeOutput.close();
-
-        // Decompress
+//
+//        // Decompress
 //        File com= new File("Compressed.txt");
 //        Scanner scan = new Scanner(com);
 //        String codeBook="";
@@ -381,17 +434,20 @@ public class VectorQuant {
 //        System.out.println("---------------------");
 //        System.out.println(codeBook);
 //        String[] s = codeBook.split("_");
+//        // s.length-3
 //        imageCode=s[s.length-1];
 //        System.out.println("---------------------");
 //        System.out.println("imageCode: "+imageCode);
 //
 //        ArrayList<String> label=new ArrayList<>();
-//        Vector<Vector<Integer>> imageVector=new Vector<>();
+//        Vector<Vector<Integer>> codeBookVector=new Vector<>();
 //        Vector<Integer> ints= new Vector<>();
+//        //s.length-3
 //        for (int i = 0; i < s.length-1; i++) {
 //            label.add(s[i].substring(0,s[i].indexOf(" ")));
 //        }
 //
+//        //s.length-3
 //        for (int i = 0; i < s.length-1; i++) {
 //
 //            String n=s[i].substring(s[i].indexOf("[")+1,s[i].length()-1);
@@ -399,13 +455,65 @@ public class VectorQuant {
 //            for(String k : num) {
 //                ints.add(Integer.parseInt(k));
 //            }
-//            imageVector.add(ints);
+//            codeBookVector.add(ints);
 //            ints= new Vector<>();
 //
 //        }
 //
 //        System.out.println("Code: "+label);
-//        System.out.println("imageVector: "+imageVector);
+//        System.out.println("codeBookVector: "+codeBookVector);
+//
+//        Vector<Vector<Integer>> imageVector= new Vector<>();
+//
+//        int length=label.get(0).length();
+//
+//        for (int i = 0; i < imageCode.length(); i+=length) {
+//
+//            for (int j = 0; j < label.size(); j++) {
+//
+//                if(label.get(j).equals(imageCode.substring(i,i+length)))
+//                {
+//                    imageVector.add(codeBookVector.get(j));
+//                    break;
+//                }
+//            }
+//
+//        }
+//
+//        System.out.println("ImageVector: "+ imageVector);
+//        int[][] newImg = new int[6][6];
+//        Vector<Integer> v1 =new Vector<>();
+//        Vector<Vector<Integer>> v2 =new Vector<>();
+//
+//        // width 6 -> width /  Math.sqrt(imageVector.get(i).size())
+//        int m = 0;
+//        int j=0;
+//        for(int i=0; (i < imageVector.size()); i+=(6 / Math.sqrt(vectorSize)))
+//        {
+//            for (int l = 0; l <  Math.sqrt(imageVector.get(i).size()); l++) {
+//                m=j;
+//                for (int k = i; k < i+(6 / Math.sqrt(vectorSize)); k++) {
+//
+//                    for (j = m; j < m+Math.sqrt(imageVector.get(i).size()); j++) {
+//
+//                        v1.add(imageVector.get(k).get(j));
+//                    }
+//
+//                }
+//                v2.add(v1);
+//                v1 = new Vector<>();
+//
+//            }
+//            j=0;
+//        }
+//        int[][] newImg1 = new int[6][6];
+//        for(int i=0; (i < 6); i++)
+//        {
+//            for( int p=0; (p < 6); p++)
+//            {
+//                newImg[i][p] = v2.get(i).get(p);
+//            }
+//        }
 
     }
 }
