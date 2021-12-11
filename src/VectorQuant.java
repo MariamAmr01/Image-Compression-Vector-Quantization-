@@ -143,9 +143,9 @@ public class VectorQuant {
         associate(codeBooks, image);
     }
 
-    public boolean compress(int vectorSize) throws IOException {
+    public boolean compress(int vectorSize, File imgFile) throws IOException {
         // MATRIX FROM IMAGE
-        File file = new File("dogColor.jpg");
+        File file = imgFile;
         if (file.exists()) {
             BufferedImage img = ImageIO.read(file);
             int width = img.getWidth();
@@ -165,11 +165,11 @@ public class VectorQuant {
             if (height % vectorSize != 0) {
                 resizedHeight = ((height / vectorSize) + 1) * vectorSize;
             }
+
             if (width % vectorSize != 0) {
                 resizedWidth = ((width / vectorSize) + 1) * vectorSize;
             }
-            System.out.println(resizedWidth);
-            System.out.println(resizedHeight);
+
             int[][] resizedImage = new int[resizedHeight][resizedWidth];
             for (int i = 0; i < resizedWidth; i++) {
                 int x = i;
@@ -315,7 +315,6 @@ public class VectorQuant {
                 }
                 j = 0;
             }
-            System.out.println(v2.size());
 
             /////////////////////////////////////////////////
 
@@ -378,57 +377,40 @@ public class VectorQuant {
         vectorFrame.add(error);
         vectorFrame.add(error2);
 
-        // if (JFileChooser.APPROVE_OPTION == result){
-        //     File file = chooser.getSelectedFile();
-        //     MessageDigest digest = MessageDigest.getInstance("MD5");
-        //     try (InputStream is = new FileInputStream(file)) {
-        //         DigestInputStream dis = new DigestInputStream(new BufferedInputStream(is), digest);
-        //         while (dis.read() != -1){}
-        //     }
-        //     //JOptionPane.showMessageDialog(null, Hex.encodeHexString(digest.digest()));
-        // }
-    //     fc.addActionListener(new ActionListener(){
-    //     public void actionPerformed(ActionEvent e) {
-    //         //Handle open button action.
-    //         if (e.getSource() == openButton) {
-    //             int returnVal = fc.showOpenDialog(FileChooserDemo.this);
-        
-    //             if (returnVal == JFileChooser.APPROVE_OPTION) {
-    //                 File file = fc.getSelectedFile();
-    //                 //This is where a real application would open the file.
-    //                 log.append("Opening: " + file.getName() + "." + newline);
-    //             } else {
-    //                 log.append("Open command cancelled by user." + newline);
-    //             }
-    //        }
-    //     }
-    // });
-    //OpenFileAction o = new OpenFileAction(vectorFrame, fc);
-    String filename = File.separator+"tmp";
-    JFileChooser fc1 = new JFileChooser(new File(filename));
-
-    // Show open dialog; this method does not return until the dialog is closed
-    fc1.showOpenDialog(vectorFrame);
-    File selFile = fc1.getSelectedFile();
 
     
         com.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
+
+                com.setVisible(false);
                 JTextField bookSizeTxt = new JTextField("Code book size");
                 JTextField vectorSizeHeight = new JTextField("Vector Height");
                 JTextField vectorSizeWidth = new JTextField("Vector Width");
                 JButton b = new JButton("Enter");
+                JButton browse = new JButton("browse");
 
                 vectorFrame.add(bookSizeTxt);
                 vectorFrame.add(vectorSizeHeight);
                 vectorFrame.add(vectorSizeWidth);
                 vectorFrame.add(b);
+                vectorFrame.add(browse);
 
                 bookSizeTxt.setBounds(130, 250, 130, 40);
                 vectorSizeHeight.setBounds(130, 350, 130, 40);
                 vectorSizeWidth.setBounds(130, 300, 130, 40);
                 b.setBounds(130, 400, 130, 40);
+                browse.setBounds(130, 100, 130, 40);
 
+                browse.setVisible(true);
+                final File[] selFile = {null};
+                browse.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event)
+                    {
+                        String filename = File.separator + "tmp";
+                        JFileChooser fc1 = new JFileChooser(new File(filename));
+                        fc1.showOpenDialog(vectorFrame);
+                        selFile[0] = fc1.getSelectedFile();
+                    }});
 
                 b.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event)
@@ -438,7 +420,7 @@ public class VectorQuant {
                         obj.setBookSize(bookSize1);
                         vectorSize = Integer.parseInt(vectorSizeHeight.getText())*Integer.parseInt(vectorSizeWidth.getText());
                         try {
-                            error2.setVisible(!obj.compress((int)Math.sqrt(vectorSize)));
+                            error2.setVisible(!obj.compress((int)Math.sqrt(vectorSize), selFile[0]));
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -447,9 +429,8 @@ public class VectorQuant {
                         vectorSizeWidth.setVisible(false);
                         vectorSizeHeight.setVisible(false);
                         b.setVisible(false);
-                        
+                        browse.setEnabled(false);
                     }});
-                    com.setEnabled(false);
             }
         });
 
@@ -462,7 +443,7 @@ public class VectorQuant {
                     JLabel grayImgLabel = new JLabel(grayImg);
                     JFrame imgFrame = new JFrame("DecompressedImage");
                     imgFrame.add(grayImgLabel);
-                    imgFrame.setSize(grayImg.getIconWidth()+50, grayImg.getIconHeight()+50);
+                    imgFrame.setSize(grayImg.getIconWidth()+50, grayImg.getIconHeight()+70);
                     imgFrame.setLayout(new  FlowLayout());
                     imgFrame.setVisible(true);
                     imgFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -489,25 +470,3 @@ public class VectorQuant {
 
     }
 }
-class OpenFileAction extends AbstractAction {
-    JFrame frame;
-    JFileChooser chooser;
-    File file;
-
-    OpenFileAction(JFrame frame, JFileChooser chooser) {
-        super("Open...");
-        this.chooser = chooser;
-        this.frame = frame;
-    }
-
-    public void actionPerformed(ActionEvent evt) {
-        // Show dialog; this method does not return until dialog is closed
-        chooser.showOpenDialog(frame);
-
-        // Get the selected file
-        file = chooser.getSelectedFile();    
-    }
-    public File getFile(){
-        return file;
-    }
-};
