@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.*;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.util.*;
 
 public class VectorQuant {
@@ -143,16 +145,16 @@ public class VectorQuant {
 
     public boolean compress(int vectorSize) throws IOException {
         // MATRIX FROM IMAGE
-        File file = new File("d3.JPG");
+        File file = new File("dogColor.jpg");
         if (file.exists()) {
             BufferedImage img = ImageIO.read(file);
             int width = img.getWidth();
             int height = img.getHeight();
-            int[][] imgArr = new int[width][height];
+            int[][] imgArr = new int[height][width];
             Raster raster = img.getData();
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
-                    imgArr[i][j] = raster.getSample(i, j, 0);
+                    imgArr[j][i] = raster.getSample(i, j, 0);
                 }
             }
 
@@ -168,7 +170,7 @@ public class VectorQuant {
             }
             System.out.println(resizedWidth);
             System.out.println(resizedHeight);
-            int[][] resizedImage = new int[resizedWidth][resizedHeight];
+            int[][] resizedImage = new int[resizedHeight][resizedWidth];
             for (int i = 0; i < resizedWidth; i++) {
                 int x = i;
                 if (i >= width) {
@@ -179,13 +181,13 @@ public class VectorQuant {
                     if (j >= height) {
                         y = height - 1;
                     }
-                    resizedImage[i][j] = imgArr[x][y];
+                    resizedImage[j][i] = imgArr[y][x];
                 }
             }
             Vector<Vector<Integer>> vectors = new Vector<>();
             //Vectors of image
-            for (int i = 0; i < resizedWidth; i += vectorSize) {
-                for (int j = 0; j < resizedHeight; j += vectorSize) {
+            for (int i = 0; i < resizedHeight; i += vectorSize) {
+                for (int j = 0; j < resizedWidth; j += vectorSize) {
                     vectors.add(new Vector<>());
                     for (int x = i; x < i + vectorSize; x++) {
                         for (int y = j; y < j + vectorSize; y++) {
@@ -322,12 +324,12 @@ public class VectorQuant {
 
             for (int i = 0; i < height; i++) {
                 for (int x = 0; x < width; x++) {
-                    int a = v2.get(x).get(i);
+                    int a = v2.get(i).get(x);
                     Color newColor = new Color(a, a, a);
                     image.setRGB(x, i, newColor.getRGB());
                 }
             }
-            File output = new File("GrayScale.jpg");
+            File output = new File("DecompressedImage.jpg");
             ImageIO.write(image, "jpg", output);
         }
         return com.exists();
@@ -336,7 +338,7 @@ public class VectorQuant {
 
     public static void main(String[] args) throws IOException {
 
-        Scanner input=new Scanner(System.in);
+        //Scanner input=new Scanner(System.in);
         //System.out.print("Enter Code book size: ");
         //int bookSize1;
        // System.out.print("Enter vector size: ");
@@ -353,6 +355,11 @@ public class VectorQuant {
         JLabel enter=new JLabel("Click your choice");
         JLabel error=new JLabel("Compressed file not found");
         JLabel error2=new JLabel("Input file not found");
+
+        // Create a file chooser
+         final JFileChooser fc  = new JFileChooser();
+        // In response to a button click:
+        //int result = fc.showOpenDialog(null);
 
         enter.setBounds(145, 60, 150, 40);
         com.setBounds(130, 100, 130, 40);
@@ -371,6 +378,40 @@ public class VectorQuant {
         vectorFrame.add(error);
         vectorFrame.add(error2);
 
+        // if (JFileChooser.APPROVE_OPTION == result){
+        //     File file = chooser.getSelectedFile();
+        //     MessageDigest digest = MessageDigest.getInstance("MD5");
+        //     try (InputStream is = new FileInputStream(file)) {
+        //         DigestInputStream dis = new DigestInputStream(new BufferedInputStream(is), digest);
+        //         while (dis.read() != -1){}
+        //     }
+        //     //JOptionPane.showMessageDialog(null, Hex.encodeHexString(digest.digest()));
+        // }
+    //     fc.addActionListener(new ActionListener(){
+    //     public void actionPerformed(ActionEvent e) {
+    //         //Handle open button action.
+    //         if (e.getSource() == openButton) {
+    //             int returnVal = fc.showOpenDialog(FileChooserDemo.this);
+        
+    //             if (returnVal == JFileChooser.APPROVE_OPTION) {
+    //                 File file = fc.getSelectedFile();
+    //                 //This is where a real application would open the file.
+    //                 log.append("Opening: " + file.getName() + "." + newline);
+    //             } else {
+    //                 log.append("Open command cancelled by user." + newline);
+    //             }
+    //        }
+    //     }
+    // });
+    //OpenFileAction o = new OpenFileAction(vectorFrame, fc);
+    String filename = File.separator+"tmp";
+    JFileChooser fc1 = new JFileChooser(new File(filename));
+
+    // Show open dialog; this method does not return until the dialog is closed
+    fc1.showOpenDialog(vectorFrame);
+    File selFile = fc1.getSelectedFile();
+
+    
         com.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 JTextField bookSizeTxt = new JTextField("Code book size");
@@ -406,9 +447,9 @@ public class VectorQuant {
                         vectorSizeWidth.setVisible(false);
                         vectorSizeHeight.setVisible(false);
                         b.setVisible(false);
+                        
                     }});
-
-
+                    com.setEnabled(false);
             }
         });
 
@@ -417,9 +458,21 @@ public class VectorQuant {
                 try {
                     error.setVisible(!obj.decompress());
                     error2.setVisible(false);
+                    ImageIcon grayImg= new ImageIcon("DecompressedImage.jpg");
+                    JLabel grayImgLabel = new JLabel(grayImg);
+                    JFrame imgFrame = new JFrame("DecompressedImage");
+                    imgFrame.add(grayImgLabel);
+                    imgFrame.setSize(grayImg.getIconWidth()+50, grayImg.getIconHeight()+50);
+                    imgFrame.setLayout(new  FlowLayout());
+                    imgFrame.setVisible(true);
+                    imgFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+                    vectorFrame.setVisible(false);
+                    
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+                decom.setEnabled(false);
             }
         });
 
@@ -436,3 +489,25 @@ public class VectorQuant {
 
     }
 }
+class OpenFileAction extends AbstractAction {
+    JFrame frame;
+    JFileChooser chooser;
+    File file;
+
+    OpenFileAction(JFrame frame, JFileChooser chooser) {
+        super("Open...");
+        this.chooser = chooser;
+        this.frame = frame;
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        // Show dialog; this method does not return until dialog is closed
+        chooser.showOpenDialog(frame);
+
+        // Get the selected file
+        file = chooser.getSelectedFile();    
+    }
+    public File getFile(){
+        return file;
+    }
+};
