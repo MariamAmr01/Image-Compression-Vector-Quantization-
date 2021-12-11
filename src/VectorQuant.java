@@ -337,15 +337,7 @@ public class VectorQuant {
 
     public static void main(String[] args) throws IOException {
 
-        //Scanner input=new Scanner(System.in);
-        //System.out.print("Enter Code book size: ");
-        //int bookSize1;
-       // System.out.print("Enter vector size: ");
-        //int vectorSize= input.nextInt();
         VectorQuant obj = new VectorQuant();
-        //2*2 = 4 (vector size)
-        //obj.compress((int)Math.sqrt(vectorSize));
-        //obj.decompress();
 
         JFrame vectorFrame = new JFrame("Vector Quantization Compression/Decompression");
         JButton com = new JButton("Compress");
@@ -357,8 +349,6 @@ public class VectorQuant {
 
         // Create a file chooser
          final JFileChooser fc  = new JFileChooser();
-        // In response to a button click:
-        //int result = fc.showOpenDialog(null);
 
         enter.setBounds(145, 60, 150, 40);
         com.setBounds(130, 100, 130, 40);
