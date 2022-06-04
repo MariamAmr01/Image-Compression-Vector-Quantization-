@@ -34,13 +34,12 @@ public class VectorQuant {
 
         for (Vector<Integer> vector : v) {
             for (int j = 0; j < vector.size(); j++) {
-                ;
                 sum.setElementAt(sum.get(j) + vector.get(j), j);
             }
 
         }
         for (int j = 0; j < sum.size(); j++) {
-            sum.set(j, sum.get(j) / v.size());
+            sum.setElementAt(sum.get(j) / v.size(), j);
         }
 
         return sum;
